@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: archapp-deployment
+  labels:
+    app: archapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: archapp
+  template:
+    metadata:
+      labels:
+        app: archapp
+    spec:
+      # 🔒 SECURITY HARDENING: Enforce non-root user rules at the Pod level
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 5678
+        fsGroup: 5678
+      
+      containers:
+      - name: archapp
+        image: archapp-image:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        
+        # 🗄️ ENVIRONMENT LINKING: Pass database secrets to Django
+        env:
+        - name: DB_NAME
+          value: "postgres"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "Israelspolicy101"
+        - name: DB_HOST
+          value: "postgres-db-service" # This will target your K8s DB Service
+        - name: DB_PORT
+          value: "5432"

@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: arch_postgres_db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Israelspolicy101
+    ports:
+      - "5432:5432"
+    volumes:
+      - arch_postgres_data:/var/lib/postgresql/data
+    networks:
+      - arch-network
+
+  web:
+    build: .
+    container_name: arch_web_app
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_DEBUG=True
+      - DJANGO_SECRET_KEY=arch_project_super_secure_secret_key_2026_production
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=Israelspolicy101
+      - DB_HOST=arch_postgres_db 
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    networks:
+      - arch-network
+
+volumes:
+  arch_postgres_data:
+
+networks:
+  arch-network:
+    driver: bridge

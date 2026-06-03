@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  labels:
+    app: web
+spec:
+  replicas: 2  # Running two copies for high availability!
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: myproject-web:latest  # Uses the image we just compiled locally
+        imagePullPolicy: Never        # Tells K8s to look at your local Docker daemon cache
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DJANGO_SECRET_KEY
+          value: arch_project_super_secure_secret_key_2026_production
+        - name: DB_NAME
+          value: postgres
+        - name: DB_USER
+          value: postgres
+        - name: DB_PASSWORD
+          value: Israelspolicy101
+        - name: DB_HOST
+          value: db                 # Points directly to the internal 'db' K8s Service
+        - name: DB_PORT
+          value: "5432"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+spec:
+  type: LoadBalancer  # Exposes the cluster to your local machine web browser
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: web
