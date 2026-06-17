@@ -1,16 +1,17 @@
 from pathlib import Path
 import os
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ---------------- SECURITY ----------------
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'arch_project_super_secure_secret_key_2026_production')
 
-
 DEBUG = True
+
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'arch_web_app', 'web', '*']
-# -------------------------------------
+
+# ---------------- APPS & MIDDLEWARE ----------------
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -52,6 +53,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
+# ---------------- DATABASE ----------------
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -62,7 +65,8 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
-# --------------------------------------------------------
+
+# ---------------- VALIDATORS & LOCALIZATION ----------------
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -76,16 +80,22 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# ---------------- STATIC FILES (WHITENOISE) ----------------
+
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+
+# SAFE CHECK: Prevents Docker compilation crash if the folder is missing on GitHub
+if (BASE_DIR / "static").exists():
+    STATICFILES_DIRS = [BASE_DIR / "static"]
+else:
+    STATICFILES_DIRS = []
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+# STORAGES = {
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+#     },
+# }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
